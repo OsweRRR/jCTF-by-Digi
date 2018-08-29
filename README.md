@@ -1,6 +1,12 @@
 # jCTF-by-Digi
 Este mod fue creado por <b>Digi (aka Hunter-Digital)</b> pero hace mucho tiempo le dejo de dar actualizaciones así que yo me tome la molestia de hacerle algunas mejoras a mi parecer.
 
+## Requerimientos
+* <b>ReHLDS</b> [click link](https://github.com/dreamstalker/rehlds/)
+* <b>ReGameDLL</b> [click link](https://github.com/s1lentq/ReGameDLL_CS)
+* <b>Reapi</b> [click link](https://github.com/s1lentq/reapi)
+* <b>AmxModX 1.8.3</b> Dev-git5154 ó versiones mayores. [click link](http://amxmodx.org/snapshots.php)
+
 ## ¿Qué le hice?
 * Removí el buy personalizado (Se incluye la compra del C4).
 * El sistema de adrenalina lo quite para hacerlo por separado del mod sin embargo las natives seguiran siendo las mismas.
@@ -15,7 +21,7 @@ Este mod fue creado por <b>Digi (aka Hunter-Digital)</b> pero hace mucho tiempo 
 * Removí <b>Orpheu</b> debido a que se usará ReGameDLL (Orpheu solo funcionaba para hookear la ronda).
 * Los estilos de luz que se creaban al tomar la bandera enemiga los removi debido a que provoca lag si no se cuenta con un buen pc.
 
-## Cvars
+## Cvars del mod
 | Cvar                          | Default | Min | Max          | Descripción                                    |
 | :---------------------------- | :-----: | :-: | :----------: | :--------------------------------------------- |
 | ctf_flagheal                  | 1       | 0   | 1            | Cura al jugador si esta cerca de su bandera<br/>`0` desactivado <br/>`1` activado |
