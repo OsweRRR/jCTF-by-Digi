@@ -22,13 +22,13 @@ Este mod fue creado por <b>Digi (aka Hunter-Digital)</b> pero hace mucho tiempo 
 * Los estilos de luz que se creaban al tomar la bandera enemiga los removi debido a que provoca lag si no se cuenta con un buen pc.
 
 ## Cvars del mod
-| Cvar                          | Default | Min | Max          | Descripción                                    |
-| :---------------------------- | :-----: | :-: | :----------: | :--------------------------------------------- |
-| ctf_flagheal                  | 1       | 0   | 1            | Cura al jugador si esta cerca de su bandera<br/>`0` desactivado <br/>`1` activado |
-| ctf_flagreturn                | 200     | -   | -            | Tiempo que durara la bandera en el suelo luego de ser soltada. |
-| ctf_respawntime               | 6       | -   | -            | Tiempo al revivir después de haber muerto. |
-| ctf_protection                | 5       | -   | -            | Tiempo de protección luego de revivir. Si le dispara a un enemigo esta se removerá |
-| ctf_sound_taken               | 1       | 0   | 1            | Sonido que se emite al capturar la bandera<br/>`0` desactivado <br/>`1` activado  |
-| ctf_sound_dropped             | 1       | 0   | 1            | Sonido que se emite al soltar la bandera<br/>`0` desactivado <br/>`1` activado |
-| ctf_sound_returned            | 1       | 0   | 1            | Sonido que se emite al ser devuelta la bandera<br/>`0` desactivado <br/>`1` activado |
-| ctf_sound_score               | 1       | 0   | 1            | Sonido que se emite al sumar puntuación después de capturar la bandera<br/>`0` desactivado <br/>`1` activado |
+| Cvar                          | Default | Min | Max | Descripción |
+| :---------------------------- | :-: | :-: | :-: | :--------------------------------------------- |
+| ctf_flagheal                  | 1   | 0   | 1   | Cura al jugador si esta cerca de su bandera:<br/>`0` desactivado <br/>`1` activado |
+| ctf_flagreturn                | 200 | -   | -   | Tiempo que durara la bandera en el suelo luego de ser soltada. |
+| ctf_respawntime               | 6   | -   | -   | Tiempo al revivir después de haber muerto. |
+| ctf_protection                | 5   | -   | -   | Tiempo de protección luego de revivir. Si le dispara a un enemigo esta se removerá |
+| ctf_sound_taken               | 1   | 0   | 1   | Sonido que se emite al capturar la bandera:<br/>`0` desactivado <br/>`1` activado  |
+| ctf_sound_dropped             | 1   | 0   | 1   | Sonido que se emite al soltar la bandera:<br/>`0` desactivado <br/>`1` activado |
+| ctf_sound_returned            | 1   | 0   | 1   | Sonido que se emite al ser devuelta la bandera:<br/>`0` desactivado <br/>`1` activado |
+| ctf_sound_score               | 1   | 0   | 1   | Sonido que se emite al sumar puntuación después de capturar la bandera:<br/>`0` desactivado <br/>`1` activado |
