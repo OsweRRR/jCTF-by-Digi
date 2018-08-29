@@ -1,0 +1,135 @@
+[es]
+TEAM_RED = Rojo
+TEAM_BLUE = Azul
+TEAM_SPEC = Espectador
+FLAG_RED = Roja
+FLAG_BLUE = Azul
+
+RESPAWNING_IN = Reviviendo en %d segundos...
+
+PROTECTION_LEFT = Protección al revivir: quedan %d segundos...
+PROTECTION_EXPIRED = La protección expiro.
+PROTECTION_TOUCHFLAG = Protección deshabilitada - Bandera tocada!
+PROTECTION_WEAPONUSE = Protección deshabilitada - Arma usada!
+
+DROPFLAG_NOFLAG = Tu no tienes la bandera como para soltarla.
+
+HINT = Pista
+
+MSG_GIVE_WEAPON = Has recibido %L ^4%s^1 y %L ^4%s^1
+MSG_TYPE_WEAPON_1 = una pistola
+MSG_TYPE_WEAPON_2 = una escopeta
+MSG_TYPE_WEAPON_3 = una metralleta
+MSG_TYPE_WEAPON_4 = un rifle de asalto
+
+HINT_1 = La bandera enemiga puede ser capturada solo si la tuya esta en tu base.
+HINT_2 = Algunos jugadores cuando mueren tiran objetos útiles, manten los ojos abiertos.
+HINT_3 = Ambas banderas se muestran en el radar como un punto que titila.
+HINT_4 = La protección por revivir sera deshabilitada al instante si usas un arma.
+HINT_5 = Para ganar tu equipo tiene que robar la bandera enemiga mientras defienden la suya.
+
+ADMIN_MOVEBASE_1 = ADMIN: mueve la bandera del equipo %L a la base
+ADMIN_MOVEBASE_2 = ADMIN %s: mueve la bandera del equipo %L a la base
+ADMIN_MOVEBASE_MOVED = La bandera %L ha sido movida a la base.
+ADMIN_MOVEBASE_SAVED = Guardar posición como base
+
+ADMIN_RETURN_1 = ADMIN: devuelve la bandera del equipo %L a la base
+ADMIN_RETURN_2 = ADMIN %s: devuelve la bandera del equipo %L a la base
+ADMIN_RETURN_DONE = La bandera %L ha sido devuelta a la base.
+ADMIN_RETURN_WAIT = La bandera %L tiene que estar al menos %d segundos en el piso antes de usar el comando devolver.
+ADMIN_RETURN_NOTDROPPED = La bandera %L no esta en el suelo.
+
+ANNOUNCE_FLAGTAKEN = %s tomó la bandera %L!
+ANNOUNCE_FLAGDROPPED = %s tiró la bandera %L!
+ANNOUNCE_FLAGRETURNED = %s devolvió la bandera %L!
+ANNOUNCE_FLAGAUTORETURNED = La bandera %L fue devuelta automáticamente!
+ANNOUNCE_FLAGCAPTURED = %s capturó la bandera %L!
+
+HUD_YOUHAVEFLAG = Tienes la bandera, vuelve a tu base!
+HUD_ENEMYHASFLAG = El enemigo tiene tu bandera, recuperala!
+HUD_RETURNYOURFLAG = Tu bandera ha sido soltada, recuperala!
+
+HUD_RETURNEDFLAG = Devolviste tu bandera!
+HUD_CAPTUREDFLAG = Capturaste la bandera del enemigo!
+
+PRINT_ADR_LOW = No tienes suficiente adrenalina para comprar este item
+PRINT_ITEM_USE = No puedes comprar este ítem nuevamente mientras esta en uso
+
+PRINT_ITEM_BULLETS_BUY = Has comprado balas infinitas por 2:00 minutos
+PRINT_B_ITEM = Balas infinitas: %02i:%02i
+PRINT_ITEM_BULLETS_END = Se te han acabado los 2:00 minutos de balas infinitas
+
+PRINT_ITEM_INVISIBILITY_BUY = Has comprado invisibilidad por 20 segundos
+PRINT_I_ITEM = Invisibilidad: %0.1f segundo%s
+PRINT_ITEM_INVISIBILITY_END = Se te han acabado los 20 segundos de invisibilidad
+
+PRINT_ITEM_HP_BUY = Has comprado regeneración de vida
+PRINT_ITEM_HP_END = Se te ha acabado el ítem de regenerar vida
+
+[en]
+TEAM_RED = Red
+TEAM_BLUE = Blue
+TEAM_SPEC = Spectator
+FLAG_RED = Red
+FLAG_BLUE = Blue
+
+RESPAWNING_IN = Respawning in %d seconds...
+
+PROTECTION_LEFT = Spawn protection: %d seconds left...
+PROTECTION_EXPIRED = Spawn protection expired.
+PROTECTION_TOUCHFLAG = Spawn protection disabled - flag touched!
+PROTECTION_WEAPONUSE = Spawn protection disabled - weapon used!
+
+DROPFLAG_NOFLAG = You don't have the flag!
+
+HINT = Hint
+
+MSG_GIVE_WEAPON = You have received %L ^4%s^1 and %L ^4%s^1
+MSG_TYPE_WEAPON_1 = a pistol
+MSG_TYPE_WEAPON_2 = a shotgun
+MSG_TYPE_WEAPON_3 = a smg
+MSG_TYPE_WEAPON_4 = a rifle
+
+HINT_1 = The enemy flag can be captured only if your flag is in the base.
+HINT_2 = Sometimes killed players drop useful items, keep an eye out.
+HINT_3 = Both flags are constantly displayed as a blinking dot on all players radar.
+HINT_4 = Spawn protection will be disabled prematurely if you use a weapon.
+HINT_5 = To win, your team needs to steal the enemy flag while defending their own flag.
+
+ADMIN_MOVEBASE_1 = ADMIN: moved %L team's flag base
+ADMIN_MOVEBASE_2 = ADMIN %s: moved %L team's flag base
+ADMIN_MOVEBASE_MOVED = The %L flag base moved to your origin.
+ADMIN_MOVEBASE_SAVED = Saved base locations as
+
+ADMIN_RETURN_1 = ADMIN: returned the %L flag to base
+ADMIN_RETURN_2 = ADMIN %s: returned the %L flag to base
+ADMIN_RETURN_DONE = The %L flag has been returned.
+ADMIN_RETURN_WAIT = The %L flag needs to be dropped at least %d seconds before you can return it by command.
+ADMIN_RETURN_NOTDROPPED = The %L flag is not dropped.
+
+ANNOUNCE_FLAGTAKEN = %s took the %L flag!
+ANNOUNCE_FLAGDROPPED = %s dropped the %L flag!
+ANNOUNCE_FLAGRETURNED = %s returned the %L flag!
+ANNOUNCE_FLAGAUTORETURNED = The %L flag returned automatically!
+ANNOUNCE_FLAGCAPTURED = %s captured the %L flag!
+
+HUD_YOUHAVEFLAG = You have the flag, return to base!
+HUD_ENEMYHASFLAG = The enemy has your flag, get it back!
+HUD_RETURNYOURFLAG = Your flag is dropped, return it!
+
+HUD_RETURNEDFLAG = You returned your team flag!
+HUD_CAPTUREDFLAG = You captured the enemy flag!
+
+PRINT_ADR_LOW = You do not have enough adrenaline to buy this item
+PRINT_ITEM_USE = You can not buy this item again while it is in use
+
+PRINT_ITEM_BULLETS_BUY = You bought infinite bullets for 2:00 minutes
+PRINT_B_ITEM = Infinite bullets: %02i:%02i
+PRINT_ITEM_BULLETS_END = You've run out of 2:00 minutes of endless bullets
+
+PRINT_ITEM_INVISIBILITY_BUY = You've bought invisibility for 20 seconds
+PRINT_I_ITEM = Invisibility: %0.1f segundo%s
+PRINT_ITEM_INVISIBILITY_END = You have finished the 20 seconds of invisibility
+
+PRINT_ITEM_HP_BUY = You have bought life regeneration
+PRINT_ITEM_HP_END = The article of regenerating life has been finished
