@@ -6,12 +6,6 @@
 #include <reapi>
 #include <jctf>
 
-/*
-#pragma pack 1 (Encrypta las strings)
-#pragma compress 1 (Anti Lysis Decompiler & Amxx Uncompress)
-#emit sysreq.c (Anti AMXX Dump decompiler)
-*/
-
 const ADMIN_RETURN =				ADMIN_RCON	// access required for admins to return flags (full list in includes/amxconst.inc)
 const ADMIN_RETURNWAIT =			15		// time the flag needs to stay dropped before it can be returned by command
 
@@ -29,7 +23,7 @@ new const Float:TASK_THINK = 			1.0
 const TASK_EQUIPAMENT = 				6451
 
 new const FLAG_CLASSNAME[] =			"ctf_flag"
-new const FLAG_MODEL[] =				"models/jctf/ctf_flag.mdl"
+new const FLAG_MODEL[] =			"models/jctf/ctf_flag.mdl"
 
 new const Float:FLAG_THINK =			0.1
 const FLAG_SKIPTHINK =				20 /* FLAG_THINK * FLAG_SKIPTHINK = 2.0 seconds ! */
@@ -37,7 +31,7 @@ const FLAG_SKIPTHINK =				20 /* FLAG_THINK * FLAG_SKIPTHINK = 2.0 seconds ! */
 new const Float:FLAG_HULL_MIN[3] =		{-2.0, -2.0, 0.0}
 new const Float:FLAG_HULL_MAX[3] =		{2.0, 2.0, 16.0}
 
-new const Float:FLAG_SPAWN_VELOCITY[3] =		{0.0, 0.0, -500.0}
+new const Float:FLAG_SPAWN_VELOCITY[3] =	{0.0, 0.0, -500.0}
 new const Float:FLAG_SPAWN_ANGLES[3] =		{0.0, 0.0, 0.0}
 
 new const Float:FLAG_DROP_VELOCITY[3] =		{0.0, 0.0, 50.0}
