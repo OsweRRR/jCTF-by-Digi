@@ -277,6 +277,7 @@ public ent_spawn(ent)
 public plugin_init()
 {
 	register_plugin("Just Capture the Flag", VERSION, AUTHOR)
+	register_cvar("jctf_version", VERSION, (FCVAR_SERVER|FCVAR_SPONLY))
 	
 	unregister_forward(FM_Spawn, gHook_EntSpawn)
 	register_touch(FLAG_CLASSNAME, "player", "flag_touch")
