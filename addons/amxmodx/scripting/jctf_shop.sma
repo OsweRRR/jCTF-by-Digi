@@ -38,12 +38,15 @@ public _native_add_item(pid, par)
 		return PLUGIN_HANDLED
 	}
 	
+	if(get_param(2) > 100)
+	{
+		log_amx("El item #%d sobrepaso el valor de 100 de adrenalina.", g_TotalItems)
+		return PLUGIN_HANDLED
+	}
+	g_szItem[g_TotalItems][ITEM_COST] = get_param(2)
 	get_string(1, g_szItem[g_TotalItems][ITEM_NAME], 31)
 	get_string(3, g_szItem[g_TotalItems][ITEM_FORWARD], 31)
-	
-	g_szItem[g_TotalItems][ITEM_COST] = get_param(2)
 	g_TotalItems++
-	
 	return PLUGIN_CONTINUE
 }
 
