@@ -21,11 +21,11 @@ new const Float:BASE_THINK =			0.25
 new const TASK_CLASSNAME[] =			"ctf_think_task"
 new const Float:TASK_THINK = 			1.0
 
-const TASK_EQUIPAMENT = 				6451
+const TASK_EQUIPAMENT = 			6451
 const LIMIT_ADRENALINE = 			100
 
 new const FLAG_CLASSNAME[] =			"ctf_flag"
-new const FLAG_MODEL[] =				"models/jctf/ctf_flag.mdl"
+new const FLAG_MODEL[] =			"models/jctf/ctf_flag.mdl"
 
 new const Float:FLAG_THINK =			0.1
 const FLAG_SKIPTHINK =				20 /* FLAG_THINK * FLAG_SKIPTHINK = 2.0 seconds ! */
@@ -33,7 +33,7 @@ const FLAG_SKIPTHINK =				20 /* FLAG_THINK * FLAG_SKIPTHINK = 2.0 seconds ! */
 new const Float:FLAG_HULL_MIN[3] =		{-2.0, -2.0, 0.0}
 new const Float:FLAG_HULL_MAX[3] =		{2.0, 2.0, 16.0}
 
-new const Float:FLAG_SPAWN_VELOCITY[3] =		{0.0, 0.0, -500.0}
+new const Float:FLAG_SPAWN_VELOCITY[3] =	{0.0, 0.0, -500.0}
 new const Float:FLAG_SPAWN_ANGLES[3] =		{0.0, 0.0, 0.0}
 
 new const Float:FLAG_DROP_VELOCITY[3] =		{0.0, 0.0, 50.0}
@@ -340,9 +340,7 @@ public plugin_init()
 	g_iSync[3] = CreateHudSyncObj()
 	
 	g_iMaxPlayers = get_maxplayers()
-	
-	set_member_game(m_GameDesc, fmt("jCTF v%s by %s", VERSION, AUTHOR))
-	
+	set_member_game(m_GameDesc, fmt("%c%c%c%c %c%s %c%c %s", 106, 67, 84, 70, 118, VERSION, 98, 121, AUTHOR))
 	register_dictionary("jctf.txt")
 }
 
