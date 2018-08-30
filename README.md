@@ -13,7 +13,7 @@ Este modo fue creado por <b>Digi (aka Hunter-Digital)</b> pero hace mucho tiempo
 ## ¿Qué le hice?
 * Removí el buy personalizado (incluyendo la compra del C4 e items con adrenalina).
 * El sistema de adrenalina lo quite para hacerlo por separado del mod sin embargo las natives seguiran siendo las mismas.
-* Modelo de la bandera en movimiento (No lo hice yo.. el model personalizado es público).
+* Modelo de la bandera en <b>movimiento</b> (No lo hice yo.. el model personalizado es público).
 * Le agregue para que la bandera se pueda soltar desde las teclas Z, X ó C.
 * Le hice un remake al sistema del respawn y protección de spawn (ya no se bug los segundos al revivir/protección).
 * El spawn de armas lo cambié por armas aleatorias.
@@ -40,3 +40,7 @@ Este modo fue creado por <b>Digi (aka Hunter-Digital)</b> pero hace mucho tiempo
 
 ## Tienda de adrenalina
 Uso el plugin de tienda por natives de <b>Sugisaki</b> [click url](https://amxmodx-es.com/Thread-Otra-Tienda-por-natives) En su post explica cómo funciona a excepción de que en la native no se deberá especificar el equipo del jugador: `native shop_add_item(const name[], cost, const function[])` el parámetro `name` irá la palabra clave con que se halla identificado en el archivo `jctf.txt`, en el parámetro `cost` irá el costo del item y no debe ser mayor a 100 de adrenalina y por último el parámetro `function`. A demás cómo dije antes se debe agregar las traducciones al archivo `jctf.txt` de los items.
+
+## Notas
+* Debe instalar el modo con los recursos que proporcioné en el repositorio <b>(modelos, sonidos y sprites)</b>.
+* Estoy constantemente actualizando los plugins así qué estar atento a los <b>commits</b>. Tal vez halla solucionado algún bug que halla dejado suelto.
