@@ -21,6 +21,7 @@ Este mod fue creado por <b>Digi (aka Hunter-Digital)</b> pero hace mucho tiempo 
 * Removí <b>Orpheu</b> debido a que se usará ReGameDLL (Orpheu solo funcionaba para hookear la ronda).
 * Los estilos de luz que se creaban al tomar la bandera enemiga los removi debido a que provoca lag si no se cuenta con un buen pc.
 * Removí el drop de items al azar cuando muere un player.
+* Removí el hud de la adrenaline. Ahora este se muestra a través de la tienda.
 
 ## Cvars del mod
 | Cvar                          | Default | Min | Max | Descripción |
