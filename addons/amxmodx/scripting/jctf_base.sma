@@ -20,10 +20,12 @@ new const Float:BASE_THINK =			0.25
 
 new const TASK_CLASSNAME[] =			"ctf_think_task"
 new const Float:TASK_THINK = 			1.0
+
 const TASK_EQUIPAMENT = 				6451
+const LIMIT_ADRENALINE = 			100
 
 new const FLAG_CLASSNAME[] =			"ctf_flag"
-new const FLAG_MODEL[] =			"models/jctf/ctf_flag.mdl"
+new const FLAG_MODEL[] =				"models/jctf/ctf_flag.mdl"
 
 new const Float:FLAG_THINK =			0.1
 const FLAG_SKIPTHINK =				20 /* FLAG_THINK * FLAG_SKIPTHINK = 2.0 seconds ! */
@@ -31,7 +33,7 @@ const FLAG_SKIPTHINK =				20 /* FLAG_THINK * FLAG_SKIPTHINK = 2.0 seconds ! */
 new const Float:FLAG_HULL_MIN[3] =		{-2.0, -2.0, 0.0}
 new const Float:FLAG_HULL_MAX[3] =		{2.0, 2.0, 16.0}
 
-new const Float:FLAG_SPAWN_VELOCITY[3] =	{0.0, 0.0, -500.0}
+new const Float:FLAG_SPAWN_VELOCITY[3] =		{0.0, 0.0, -500.0}
 new const Float:FLAG_SPAWN_ANGLES[3] =		{0.0, 0.0, 0.0}
 
 new const Float:FLAG_DROP_VELOCITY[3] =		{0.0, 0.0, 50.0}
@@ -105,6 +107,15 @@ new const g_szMLFlagTeam[][] =
 	"FLAG_RED",
 	"FLAG_BLUE",
 	NULL
+}
+
+enum
+{
+	REWARD_CAPTURED = 15,
+	REWARD_RETURNED = 10,
+	REWARD_STOLEN = 5,
+	REWARD_DROPPED = 15,
+	REWARD_FRAG = 3
 }
 
 enum
@@ -202,6 +213,7 @@ new bool:g_bProtected[33]
 new bool:g_bRespawned[33]
 new g_bRespawn[33]
 new g_bProtecting[33]
+new g_bAdrenaline[33]
 new g_bPlayerName[33][33]
 
 new Float:g_fFlagBase[3][3]
@@ -381,15 +393,19 @@ public plugin_natives()
 {
 	register_library("jctf")
 	register_native("jctf_get_flagcarrier", "native_get_flagcarrier")
+	
+	register_native("get_user_adrenaline", "native_get_adrenaline")
+	register_native("set_user_adrenaline", "native_set_adrenaline")
 }
 
-public jctf_end_map()
+public native_get_adrenaline(iPlugin, iParams)
 {
-	for(new iFlagTeam = TEAM_RED; iFlagTeam <= TEAM_BLUE; iFlagTeam++)
-	{
-		flag_sendHome(iFlagTeam)
-		task_remove(g_iFlagEntity[iFlagTeam])
-	}
+	return g_bAdrenaline[get_param(1)]
+}
+
+public native_set_adrenaline(iPlugin, iParams)
+{
+	g_bAdrenaline[get_param(1)] = get_param(2)
 }
 
 public plugin_end()
@@ -401,6 +417,18 @@ public native_get_flagcarrier(iPlugin, iParams)
 {
 	new id = get_param(1)
 	return g_iFlagHolder[get_opTeam(g_iTeam[id])] == id
+}
+
+public jctf_flag(iEvent, iPlayer, iFlagTeam, bool:bAssist)
+{
+	switch(iEvent)
+	{
+		case FLAG_CAPTURED: g_bAdrenaline[iPlayer] = clamp(g_bAdrenaline[iPlayer] + REWARD_CAPTURED, 0, LIMIT_ADRENALINE)
+		case FLAG_RETURNED: g_bAdrenaline[iPlayer] = clamp(g_bAdrenaline[iPlayer] + REWARD_RETURNED, 0, LIMIT_ADRENALINE)
+		case FLAG_STOLEN: g_bAdrenaline[iPlayer] = clamp(g_bAdrenaline[iPlayer] + REWARD_STOLEN, 0, LIMIT_ADRENALINE)
+		case FLAG_DROPPED: g_bAdrenaline[iPlayer] = clamp(g_bAdrenaline[iPlayer] - REWARD_DROPPED, 0, LIMIT_ADRENALINE)
+	}
+	return PLUGIN_HANDLED
 }
 
 public client_kill(id)
@@ -842,6 +870,7 @@ public client_putinserver(id)
 	g_bAlive[id] = false
 	g_bProtected[id] = false
 	g_bRespawned[id] = false
+	g_bAdrenaline[id] = 0
 	
 	g_iTeam[id] = TEAM_SPEC
 }
@@ -854,6 +883,7 @@ public client_disconnected(id)
 	g_iTeam[id] = TEAM_NONE
 	g_bAlive[id] = false
 	g_bRespawned[id] = false
+	g_bAdrenaline[id] = 0
 	
 	g_bAssisted[id][TEAM_RED] = false
 	g_bAssisted[id][TEAM_BLUE] = false
@@ -965,6 +995,7 @@ public event_playerKilled()
 	
 	g_bRespawned[v] = true
 	g_bAlive[v] = false
+	g_bAdrenaline[k] = (g_bAdrenaline[k] + REWARD_FRAG, 0, LIMIT_ADRENALINE)
 	
 	task_remove(v - TASK_EQUIPAMENT)
 	
