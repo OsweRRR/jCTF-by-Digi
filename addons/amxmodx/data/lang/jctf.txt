@@ -66,6 +66,15 @@ PRINT_ITEM_INVISIBILITY_END = Se te han acabado los 20 segundos de invisibilidad
 PRINT_ITEM_HP_BUY = Has comprado regeneración de vida
 PRINT_ITEM_HP_END = Se te ha acabado el ítem de regenerar vida
 
+MENU_SPITEMS_HEADER = Items Especiales^n        Mi Adrenalina: \y%d/%d\d
+MENU_SPITEMS_OP_1 = Invisibilidad
+MENU_SPITEMS_OP_2 = Regenerar Vida
+MENU_SPITEMS_OP_3 = Balas Infinitas
+
+MENU_BACK = Pág. Anterior
+MENU_NEXT = Pág. Siguiente
+MENU_EXIT = Salir
+
 [en]
 TEAM_RED = Red
 TEAM_BLUE = Blue
@@ -133,3 +142,12 @@ PRINT_ITEM_INVISIBILITY_END = You have finished the 20 seconds of invisibility
 
 PRINT_ITEM_HP_BUY = You have bought life regeneration
 PRINT_ITEM_HP_END = The article of regenerating life has been finished
+
+MENU_SPITEMS_HEADER = Special Items^n        My Adrenaline: \y%d/%d\d
+MENU_SPITEMS_OP_1 = Invisibility
+MENU_SPITEMS_OP_2 = Regenerate Hp
+MENU_SPITEMS_OP_3 = Infinite Bullets
+
+MENU_BACK = Back Page
+MENU_NEXT = Next Page
+MENU_EXIT = Exit
