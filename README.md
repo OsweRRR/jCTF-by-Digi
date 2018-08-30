@@ -25,6 +25,7 @@ Este modo fue creado por <b>Digi (aka Hunter-Digital)</b> pero hace mucho tiempo
 * Los estilos de luz que se creaban al tomar la bandera enemiga los removi debido a que causaba bajos de <b>FPS</b> con pc's de gama baja.
 * Removí el drop de items al azar cuando muere un player (pronto añadire esta función.. la saque sin querer).
 * Removí el hud de la adrenalina. Ahora este se muestra a través de la tienda. `say /adrenaline`
+* Removí el hooksay por si quieren implementar un admin-chat-color o algún plugin que hookee el say.
 
 ## Cvars del modo
 | Cvar                          | Default | Min | Max | Descripción |
