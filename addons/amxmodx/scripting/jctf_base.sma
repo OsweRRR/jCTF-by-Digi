@@ -1271,7 +1271,7 @@ game_announce(iEvent, iFlagTeam, szName[])
 	
 	if(get_pcvar_num(pCvar_ctf_sound[iEvent]))
 	{
-		client_cmd(0, "mp3 play ^"sound/ctf/%s.mp3^"", g_szSounds[iEvent][iFlagTeam])
+		client_cmd(0, "mp3 play ^"sound/jctf/%s.mp3^"", g_szSounds[iEvent][iFlagTeam])
 	}
 }
 
