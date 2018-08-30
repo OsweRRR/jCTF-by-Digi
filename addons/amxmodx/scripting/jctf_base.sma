@@ -995,7 +995,7 @@ public event_playerKilled()
 	
 	g_bRespawned[v] = true
 	g_bAlive[v] = false
-	g_bAdrenaline[k] = (g_bAdrenaline[k] + REWARD_FRAG, 0, LIMIT_ADRENALINE)
+	g_bAdrenaline[k] = clamp(g_bAdrenaline[k] + REWARD_FRAG, 0, LIMIT_ADRENALINE)
 	
 	task_remove(v - TASK_EQUIPAMENT)
 	
