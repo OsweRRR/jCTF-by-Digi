@@ -1091,8 +1091,20 @@ public admin_cmd_moveFlag(id, level, cid)
 		return PLUGIN_HANDLED
 	}
 	
-	new iTeam = read_argv_int(1)
+	new szTeam[2]
+	read_argv(1, szTeam, charsmax(szTeam))
+
+	new iTeam = str_to_num(szTeam)
 	
+	if(!(TEAM_RED <= iTeam <= TEAM_BLUE))
+	{
+		switch(szTeam[0])
+		{
+			case 'r', 'R': iTeam = 1
+			case 'b', 'B': iTeam = 2
+		}
+	}
+
 	if(!(TEAM_RED <= iTeam <= TEAM_BLUE))
 		return PLUGIN_HANDLED
 	
