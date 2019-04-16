@@ -9,7 +9,7 @@ enum _:ITEMS
 {
 	ITEM_NAME[32],
 	ITEM_COST,
-	ITEM_FORWARD[32]
+	ITEM_FORWARD
 }
 
 new g_szItem[MAX_ITEM][ITEMS], g_TotalItems
@@ -43,9 +43,22 @@ public _native_add_item(pid, par)
 		log_amx("El item #%d sobrepaso el valor de 100 de adrenalina.", g_TotalItems)
 		return PLUGIN_HANDLED
 	}
+	new FWD[32]
 	g_szItem[g_TotalItems][ITEM_COST] = get_param(2)
 	get_string(1, g_szItem[g_TotalItems][ITEM_NAME], 31)
-	get_string(3, g_szItem[g_TotalItems][ITEM_FORWARD], 31)
+	get_string(3, FWD, charsmax(FWD))
+	if(get_func_id(FWD, pid) == -1)
+	{
+		new pluginfilename[32]
+		get_plugin(pid, pluginfilename, charsmax(pluginfilename));
+		log_amx("[%s]Funcion %s Inexistente", pluginfilename, FWD);
+		return PLUGIN_HANDLED
+	}
+	if((g_szItem[g_TotalItems][ITEM_FORWARD] = CreateOneForward(pid, FWD, FP_CELL, FP_STRING)) == -1)
+	{
+		log_amx("Ocurrio un error al crear la funcion %s", FWD)
+		return PLUGIN_HANDLED
+	}
 	g_TotalItems++
 	return PLUGIN_CONTINUE
 }
@@ -85,11 +98,9 @@ public buymenu_handled(id, menu, item)
 		return PLUGIN_HANDLED
 	}
 	
-	new ret, g_forward
-	g_forward = CreateMultiForward(g_szItem[item][ITEM_FORWARD], ET_STOP, FP_CELL, FP_STRING)
-	ExecuteForward(g_forward, ret, id, g_szItem[item][ITEM_NAME])
-	DestroyForward(g_forward)
-	
+	new ret//, g_forward
+	//g_forward = CreateMultiForward(g_szItem[item][ITEM_FORWARD], ET_STOP, FP_CELL, FP_STRING)
+	ExecuteForward(g_szItem[item][ITEM_FORWARD], ret, id, g_szItem[item][ITEM_NAME]);
 	if(ret == PLUGIN_HANDLED)
 	{
 		return PLUGIN_HANDLED
