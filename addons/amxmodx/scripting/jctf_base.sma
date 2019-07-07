@@ -320,7 +320,7 @@ public plugin_init()
 	register_message(gMsg_RoundTime, "msg_roundTime")
 	register_message(gMsg_TeamScore, "msg_teamScore")
 	
-	set_msg_block(get_user_msgid("ClCorpse"), BLOCK_SET) /* Desaparece el cuerpo cuando muere */
+	set_msg_block(get_user_msgid("ClCorpse"), BLOCK_SET)
 	
 	pCvar_ctf_flagheal = register_cvar("ctf_flagheal", "1")
 	pCvar_ctf_flagreturn = register_cvar("ctf_flagreturn", "200")
