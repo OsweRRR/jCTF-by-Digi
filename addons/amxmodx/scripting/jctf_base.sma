@@ -109,12 +109,11 @@ enum
 	REWARD_CAPTURED = 15,
 	REWARD_RETURNED = 10,
 	REWARD_STOLEN = 5,
-	REWARD_DROPPED = 15,
 	REWARD_FRAG = 3,
 	REWARD_KILL_FLAGHOLDER = 20,
 	
 	PENALTY_SUICIDE = 20,
-	PENALTY_DROP = 10
+	PENALTY_DROP = 15
 }
 
 enum
@@ -206,6 +205,7 @@ new pCvar_ctf_flagheal
 new pCvar_ctf_flagreturn
 new pCvar_ctf_respawntime
 new pCvar_ctf_protection
+new pCvar_ctf_glows
 
 new pCvar_ctf_sound[4]
 
@@ -282,6 +282,7 @@ public plugin_init()
 	register_think(TASK_CLASSNAME, "task_think")
 	
 	register_forward(FM_GetGameDescription, "pfn_GameDescription", 0)
+	register_forward(FM_ClientKill, "pfn_pAutoKilled", 0)
 	unregister_forward(FM_Spawn, forward_ObjSpawn)
 	
 	new iEnt = create_entity(INFO_TARGET)
@@ -298,7 +299,7 @@ public plugin_init()
 	register_event_ex("TeamInfo", "player_joinTeam", RegisterEvent_Global)
 	
 	new sWeaponName[32]
-	for(new i = 1 ; i <= CSW_P90 ; i++)
+	for(new i = 1; i <= CSW_P90; i++)
 	{
 		if(get_weaponname(i, sWeaponName, charsmax(sWeaponName)))
 		{
@@ -333,6 +334,7 @@ public plugin_init()
 	pCvar_ctf_flagreturn = register_cvar("ctf_flagreturn", "200")
 	pCvar_ctf_respawntime = register_cvar("ctf_respawntime", "8")
 	pCvar_ctf_protection = register_cvar("ctf_protection", "6")
+	pCvar_ctf_glows = register_cvar("ctf_glows", "1")
 	
 	pCvar_ctf_sound[EVENT_TAKEN] = register_cvar("ctf_sound_taken", "1")
 	pCvar_ctf_sound[EVENT_DROPPED] = register_cvar("ctf_sound_dropped", "1")
@@ -447,7 +449,6 @@ public jctf_flag(iEvent, iPlayer, iFlagTeam, bool:bAssist)
 		case FLAG_CAPTURED: g_bAdrenaline[iPlayer] = clamp(g_bAdrenaline[iPlayer] + REWARD_CAPTURED, 0, LIMIT_ADRENALINE)
 		case FLAG_RETURNED: g_bAdrenaline[iPlayer] = clamp(g_bAdrenaline[iPlayer] + REWARD_RETURNED, 0, LIMIT_ADRENALINE)
 		case FLAG_STOLEN: g_bAdrenaline[iPlayer] = clamp(g_bAdrenaline[iPlayer] + REWARD_STOLEN, 0, LIMIT_ADRENALINE)
-		case FLAG_DROPPED: g_bAdrenaline[iPlayer] = clamp(g_bAdrenaline[iPlayer] - REWARD_DROPPED, 0, LIMIT_ADRENALINE)
 	}
 	return PLUGIN_HANDLED
 }
@@ -521,8 +522,16 @@ public flag_spawn(iFlagTeam)
 	entity_set_vector(ent, EV_VEC_velocity, FLAG_SPAWN_VELOCITY)
 	entity_set_int(ent, EV_INT_movetype, MOVETYPE_TOSS)
 	
+	if(get_pcvar_num(pCvar_ctf_glows))
+		entity_set_int(ent, EV_INT_renderfx, kRenderFxGlowShell)
+	
 	entity_set_float(ent, EV_FL_renderamt, 100.0)
 	entity_set_float(ent, EV_FL_nextthink, fGameTime + BASE_THINK)
+	
+	if(iFlagTeam == TEAM_RED)
+		entity_set_vector(ent, EV_VEC_rendercolor, Float:{150.0, 0.0, 0.0})
+	else
+		entity_set_vector(ent, EV_VEC_rendercolor, Float:{0.0, 0.0, 150.0})
 	
 	g_iBaseEntity[iFlagTeam] = ent
 	return PLUGIN_CONTINUE
@@ -791,6 +800,9 @@ public flag_touch(ent, id)
 
 			if(g_bProtected[id])
 				player_removeProtection(id, "PROTECTION_TOUCHFLAG")
+			// Podria colisionar con el item de invisiblidad
+			//else
+				//player_updateRender(id)
 		}
 	}
 	else
@@ -819,6 +831,9 @@ public flag_touch(ent, id)
 
 		if(g_bProtected[id])
 			player_removeProtection(id, "PROTECTION_TOUCHFLAG")
+		// Podria colisionar con el item de invisiblidad
+		//else
+			//player_updateRender(id)
 
 		game_announce(EVENT_TAKEN, iFlagTeam, g_bPlayerName[id])
 	}
@@ -959,11 +974,11 @@ public pfn_pSpawn(id)
 	}
 	
 	set_ent_data(id, "CBasePlayer", "m_iRadioMessages", 0)
-	set_user_rendering(id, kRenderFxNone, 0, 0, 0, kRenderTransAdd, 100)
 	
 	g_bProtected[id] = true
 	g_bProtecting[id] = get_systime() + get_pcvar_num(pCvar_ctf_protection)
 	
+	player_updateRender(id)
 	strip_user_weapons(id)
 	
 	new iPistols = random_num(0, 5)
@@ -980,6 +995,19 @@ public pfn_pSpawn(id)
 	return HAM_IGNORED
 }
 
+public pfn_pAutoKilled(id)
+{
+	if(is_user_connected(id))
+	{
+		if(g_bAdrenaline[id] >= PENALTY_SUICIDE)
+		{
+			g_bAdrenaline[id] -= PENALTY_SUICIDE
+		}
+		client_print_color(id, id, "%s%L", CHAT_PREFIX, id, "PENALTY_SUICIDE", PENALTY_SUICIDE)
+	}
+	return FMRES_IGNORED
+}
+
 public pfn_GameDescription()
 {
 	forward_return(FMV_STRING, fmt("%c%c%c%c %c%s %c%c %s", 106, 67, 84, 70, 118, VERSION, 98, 121, AUTHOR))
@@ -992,10 +1020,30 @@ public player_removeProtection(id, szLang[])
 		return
 	
 	g_bProtected[id] = false
-	set_user_rendering(id)
+	player_updateRender(id)
 	
 	set_hudmessage(HUD_PROTECTION)
 	ShowSyncHudMsg(id, g_iSync[1], "%L", id, szLang)
+}
+
+public player_updateRender(id)
+{
+	new bool:bGlows = (get_pcvar_num(pCvar_ctf_glows) == 1)
+	new iMode = kRenderNormal
+	new iEffect = kRenderFxNone
+	new iAmount = 0
+	new iColor[3] = { 0, 0, 0 }
+	
+	if(g_bProtected[id])
+	{
+		iEffect = bGlows ? kRenderFxGlowShell : kRenderFxNone
+		iMode = bGlows ? kRenderNormal : kRenderTransAdd
+		iAmount = bGlows ? 90 : 100
+		
+		iColor[0] = bGlows ? (g_iTeam[id] == TEAM_RED ? 155 : 0) : 0
+		iColor[2] = bGlows ? (g_iTeam[id] == TEAM_BLUE ? 155 : 0) : 0
+	}
+	set_user_rendering(id, iEffect, iColor[0], iColor[1], iColor[2], iMode, iAmount)
 }
 
 public event_playerKilled()
@@ -1004,15 +1052,7 @@ public event_playerKilled()
 	new iVictim = read_data(2)
 	
 	g_bRespawn[iVictim] = get_systime() + get_pcvar_num(pCvar_ctf_respawntime)
-	if(iVictim == iKiller)
-	{
-		if(g_bAdrenaline[iVictim] >= PENALTY_SUICIDE)
-		{
-			g_bAdrenaline[iVictim] -= PENALTY_SUICIDE
-		}
-		client_print_color(iVictim, iVictim, "%s%L", CHAT_PREFIX, iVictim, "PENALTY_SUICIDE", PENALTY_SUICIDE)
-	}
-	else if(1 <= iKiller <= MaxClients)
+	if(1 <= iKiller <= MaxClients && iVictim != iKiller)
 	{
 		g_bAdrenaline[iKiller] = clamp(g_bAdrenaline[iKiller] + REWARD_FRAG, 0, LIMIT_ADRENALINE)
 		
@@ -1025,6 +1065,7 @@ public event_playerKilled()
 		}
 	}
 	player_dropFlag(iVictim)
+	player_updateRender(iVictim)
 	
 	set_hudmessage(HUD_HINT)
 	ShowSyncHudMsg(iVictim, g_iSync[2], "%L: %L", iVictim, "HINT", iVictim, fmt("HINT_%d", random_num(1, 5)))
@@ -1082,7 +1123,7 @@ public player_dropFlag(id)
 	if(is_user_alive(id))
 	{
 		new Float:fVelocity[3]
-		velocity_by_aim(id, 200, fVelocity)
+		velocity_by_aim(id, 500, fVelocity)
 		
 		fVelocity[z] = 0.0
 		entity_set_vector(ent, EV_VEC_velocity, fVelocity)
