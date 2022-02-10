@@ -75,6 +75,11 @@ MENU_BACK = Pág. Anterior
 MENU_NEXT = Pág. Siguiente
 MENU_EXIT = Salir
 
+REWARD_KILL_FLAGHOLDER = Bonus %d adrenalina por matar al portador de la bandera
+
+PENALTY_SUICIDE = Perdiste %d adrenalina suicidarte.
+PENALTY_DROP = Perdiste %d adrenalina por soltar la bandera.
+
 [en]
 TEAM_RED = Red
 TEAM_BLUE = Blue
@@ -151,3 +156,8 @@ MENU_SPITEMS_OP_3 = Infinite Bullets
 MENU_BACK = Back Page
 MENU_NEXT = Next Page
 MENU_EXIT = Exit
+
+REWARD_KILL_FLAGHOLDER = Bonus %d adrenaline for killing the flag holder
+
+PENALTY_SUICIDE = You lost %d adrenaline for killing yourself.
+PENALTY_DROP = You lost %d adrenaline for dropping the flag.
