@@ -297,6 +297,15 @@ public plugin_init()
 	register_event_ex("DeathMsg", "event_playerKilled", RegisterEvent_Global)
 	register_event_ex("TeamInfo", "player_joinTeam", RegisterEvent_Global)
 	
+	new sWeaponName[32]
+	for(new i = 1 ; i <= CSW_P90 ; i++)
+	{
+		if(get_weaponname(i, sWeaponName, charsmax(sWeaponName)))
+		{
+			RegisterHam(Ham_Weapon_PrimaryAttack, sWeaponName, "player_useWeapon", 1)
+		}
+	}
+	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_knife", "player_useWeapon", 1)
 	RegisterHam(Ham_Spawn, "player", "pfn_pSpawn", true)
 	RegisterHam(Ham_TraceAttack, "player", "pfn_pTraceAttack", false)
 	
@@ -908,6 +917,25 @@ public player_joinTeam()
 		case 'C': g_iTeam[id] = TEAM_BLUE
 		case 'U': g_iTeam[id] = TEAM_NONE
 		default: g_iTeam[id] = TEAM_SPEC
+	}
+}
+
+public player_useWeapon(ent)
+{
+	if(!is_valid_ent(ent))
+	{
+		return
+	}
+	
+	static id
+	id = entity_get_edict(ent, EV_ENT_owner)
+	
+	if(1 <= id <= MaxClients && is_user_alive(id))
+	{
+		if(g_bProtected[id])
+		{
+			player_removeProtection(id, "PROTECTION_WEAPONUSE")
+		}
 	}
 }
 
