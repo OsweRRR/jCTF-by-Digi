@@ -39,6 +39,8 @@ ADMIN_RETURN_DONE = La bandera %L ha sido devuelta a la base.
 ADMIN_RETURN_WAIT = La bandera %L tiene que estar al menos %d segundos en el piso antes de usar el comando devolver.
 ADMIN_RETURN_NOTDROPPED = La bandera %L no esta en el suelo.
 
+ADMIN_TEAM_NOT_SPECIFIED = Debes especificar un equipo <red/blue>
+
 ANNOUNCE_FLAGTAKEN = %s tomó la bandera %L!
 ANNOUNCE_FLAGDROPPED = %s tiró la bandera %L!
 ANNOUNCE_FLAGRETURNED = %s devolvió la bandera %L!
@@ -120,6 +122,8 @@ ADMIN_RETURN_2 = ADMIN %s: returned the %L flag to base
 ADMIN_RETURN_DONE = The %L flag has been returned.
 ADMIN_RETURN_WAIT = The %L flag needs to be dropped at least %d seconds before you can return it by command.
 ADMIN_RETURN_NOTDROPPED = The %L flag is not dropped.
+
+ADMIN_TEAM_NOT_SPECIFIED = You must specify a team <red/blue>
 
 ANNOUNCE_FLAGTAKEN = %s took the %L flag!
 ANNOUNCE_FLAGDROPPED = %s dropped the %L flag!
