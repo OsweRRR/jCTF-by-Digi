@@ -312,7 +312,7 @@ public plugin_init()
 	
 	register_clcmd("ctf_moveflag", "admin_cmd_moveFlag", ADMIN_RCON, "<red/blue> - Moves team's flag base to your origin (for map management)")
 	register_clcmd("ctf_save", "admin_cmd_saveFlags", ADMIN_RCON)
-	register_clcmd("ctf_return", "admin_cmd_returnFlag", ADMIN_RETURN)
+	register_clcmd("ctf_return", "admin_cmd_returnFlag", ADMIN_RETURN, "<red/blue> - Return the flag.")
 	
 	register_clcmd("say /dropflag", "player_cmd_dropFlag")
 	
@@ -353,34 +353,38 @@ public plugin_init()
 
 public plugin_cfg()
 {
-	new szFile[44], szMap[32]
+	new sDir[40]
+	new sMapName[32]
+	new iFile
 	
-	get_mapname(szMap, charsmax(szMap))
-	formatex(szFile, charsmax(szFile), FLAG_SAVELOCATION, szMap)
+	get_mapname(sMapName, charsmax(sMapName))
+	formatex(sDir, charsmax(sDir), FLAG_SAVELOCATION, sMapName)
 	
-	new hFile = fopen(szFile, "rt")
-	if(hFile)
+	if((iFile = fopen(sDir, "rt")))
 	{
+		new sLine[24]
+		new sOrigin[3][6]
 		new iFlagTeam = TEAM_RED
-		new szData[24]
-		new szOrigin[3][6]
 		
-		while(fgets(hFile, szData, charsmax(szData)))
+		while(!feof(iFile))
 		{
-			if(iFlagTeam > TEAM_BLUE)
-				break
+			fgets(iFile, sLine, charsmax(sLine))
+			trim(sLine)
 			
-			trim(szData)
-			parse(szData, szOrigin[x], charsmax(szOrigin[]), szOrigin[y], charsmax(szOrigin[]), szOrigin[z], charsmax(szOrigin[]))
-			
-			g_fFlagBase[iFlagTeam][x] = str_to_float(szOrigin[x])
-			g_fFlagBase[iFlagTeam][y] = str_to_float(szOrigin[y])
-			g_fFlagBase[iFlagTeam][z] = str_to_float(szOrigin[z])
-			
-			iFlagTeam++
+			if(sLine[0] && sLine[0] != ';' && sLine[0] != '/')
+			{
+				parse(sLine, sOrigin[x], charsmax(sOrigin[]), sOrigin[y], charsmax(sOrigin[]), sOrigin[z], charsmax(sOrigin[]))
+				
+				g_fFlagBase[iFlagTeam][x] = str_to_float(sOrigin[x])
+				g_fFlagBase[iFlagTeam][y] = str_to_float(sOrigin[y])
+				g_fFlagBase[iFlagTeam][z] = str_to_float(sOrigin[z])
+				
+				iFlagTeam++
+			}
 		}
-		fclose(hFile)
 	}
+	fclose(iFile)
+	
 	flag_spawn(TEAM_RED)
 	flag_spawn(TEAM_BLUE)
 	
@@ -1026,26 +1030,6 @@ public player_removeProtection(id, szLang[])
 	ShowSyncHudMsg(id, g_iSync[1], "%L", id, szLang)
 }
 
-public player_updateRender(id)
-{
-	new bool:bGlows = (get_pcvar_num(pCvar_ctf_glows) == 1)
-	new iMode = kRenderNormal
-	new iEffect = kRenderFxNone
-	new iAmount = 0
-	new iColor[3] = { 0, 0, 0 }
-	
-	if(g_bProtected[id])
-	{
-		iEffect = bGlows ? kRenderFxGlowShell : kRenderFxNone
-		iMode = bGlows ? kRenderNormal : kRenderTransAdd
-		iAmount = bGlows ? 90 : 100
-		
-		iColor[0] = bGlows ? (g_iTeam[id] == TEAM_RED ? 155 : 0) : 0
-		iColor[2] = bGlows ? (g_iTeam[id] == TEAM_BLUE ? 155 : 0) : 0
-	}
-	set_user_rendering(id, iEffect, iColor[0], iColor[1], iColor[2], iMode, iAmount)
-}
-
 public event_playerKilled()
 {
 	new iKiller = read_data(1)
@@ -1147,36 +1131,33 @@ public admin_cmd_moveFlag(id, level, cid)
 		return PLUGIN_HANDLED
 	}
 	
-	new szTeam[2]
-	read_argv(1, szTeam, charsmax(szTeam))
-
-	new iTeam = str_to_num(szTeam)
+	new sTeam[3], iTeam
+	read_argv(1, sTeam, charsmax(sTeam))
 	
-	if(!(TEAM_RED <= iTeam <= TEAM_BLUE))
+	switch(sTeam[0])
 	{
-		switch(szTeam[0])
+		case 'r', 'R': iTeam = TEAM_RED
+		case 'b', 'B': iTeam = TEAM_BLUE
+		default: iTeam = TEAM_NONE
+	}
+	
+	if(TEAM_RED <= iTeam <= TEAM_BLUE)
+	{
+		entity_get_vector(id, EV_VEC_origin, g_fFlagBase[iTeam])
+		entity_set_origin(g_iBaseEntity[iTeam], g_fFlagBase[iTeam])
+		entity_set_vector(g_iBaseEntity[iTeam], EV_VEC_velocity, FLAG_SPAWN_VELOCITY)
+		
+		if(g_iFlagHolder[iTeam] == FLAG_HOLD_BASE)
 		{
-			case 'r', 'R': iTeam = 1
-			case 'b', 'B': iTeam = 2
+			entity_set_origin(g_iFlagEntity[iTeam], g_fFlagBase[iTeam])
+			entity_set_vector(g_iFlagEntity[iTeam], EV_VEC_velocity, FLAG_SPAWN_VELOCITY)
 		}
+		client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_MOVEBASE_MOVED", id, g_szMLFlagTeam[iTeam])
 	}
-
-	if(!(TEAM_RED <= iTeam <= TEAM_BLUE))
-		return PLUGIN_HANDLED
-	
-	entity_get_vector(id, EV_VEC_origin, g_fFlagBase[iTeam])
-	
-	entity_set_origin(g_iBaseEntity[iTeam], g_fFlagBase[iTeam])
-	entity_set_vector(g_iBaseEntity[iTeam], EV_VEC_velocity, FLAG_SPAWN_VELOCITY)
-	
-	if(g_iFlagHolder[iTeam] == FLAG_HOLD_BASE)
+	else
 	{
-		entity_set_origin(g_iFlagEntity[iTeam], g_fFlagBase[iTeam])
-		entity_set_vector(g_iFlagEntity[iTeam], EV_VEC_velocity, FLAG_SPAWN_VELOCITY)
+		client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_TEAM_NOT_SPECIFIED") 
 	}
-	
-	client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_MOVEBASE_MOVED", id, g_szMLFlagTeam[iTeam])
-	
 	return PLUGIN_HANDLED
 }
 
@@ -1201,11 +1182,11 @@ public admin_cmd_saveFlags(id, level, cid)
 
 	if(file_exists(szFile))
 		delete_file(szFile)
-
+	
 	write_file(szFile, szBuffer)
-
+	
 	client_print(id, print_console, "%s%L %s", CONSOLE_PREFIX, id, "ADMIN_MOVEBASE_SAVED", szFile)
-
+	
 	return PLUGIN_HANDLED
 }
 
@@ -1216,32 +1197,45 @@ public admin_cmd_returnFlag(id, level, cid)
 		return PLUGIN_HANDLED
 	}
 	
-	new iTeam = read_argv_int(1)
+	new sTeam[3], iTeam
+	read_argv(1, sTeam, charsmax(sTeam))
 	
-	if(!(TEAM_RED <= iTeam <= TEAM_BLUE))
-		return PLUGIN_HANDLED
-	
-	if(g_iFlagHolder[iTeam] == FLAG_HOLD_DROPPED)
+	switch(sTeam[0])
 	{
-		if(g_fFlagDropped[iTeam] < (get_gametime() - ADMIN_RETURNWAIT))
+		case 'r', 'R': iTeam = TEAM_RED
+		case 'b', 'B': iTeam = TEAM_BLUE
+		default: iTeam = TEAM_NONE
+	}
+	
+	if(TEAM_RED <= iTeam <= TEAM_BLUE)
+	{
+		if(g_iFlagHolder[iTeam] == FLAG_HOLD_DROPPED)
 		{
-			new Float:fFlagOrigin[3]
-			entity_get_vector(g_iFlagEntity[iTeam], EV_VEC_origin, fFlagOrigin)
-			
-			flag_sendHome(iTeam)
-			
-			ExecuteForward(handle_JctfFlag, _, FLAG_ADMINRETURN, id, iTeam, false)
-			
-			game_announce(EVENT_RETURNED, iTeam, NULL)
-			
-			client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_RETURN_DONE", id, g_szMLFlagTeam[iTeam])
+			if(g_fFlagDropped[iTeam] < (get_gametime() - ADMIN_RETURNWAIT))
+			{
+				new Float:fFlagOrigin[3]
+				entity_get_vector(g_iFlagEntity[iTeam], EV_VEC_origin, fFlagOrigin)
+				
+				flag_sendHome(iTeam)
+				game_announce(EVENT_RETURNED, iTeam, NULL)
+				ExecuteForward(handle_JctfFlag, _, FLAG_ADMINRETURN, id, iTeam, false)
+				
+				client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_RETURN_DONE", id, g_szMLFlagTeam[iTeam])
+			}
+			else
+			{
+				client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_RETURN_WAIT", id, g_szMLFlagTeam[iTeam], ADMIN_RETURNWAIT)
+			}
 		}
 		else
-			client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_RETURN_WAIT", id, g_szMLFlagTeam[iTeam], ADMIN_RETURNWAIT)
+		{
+			client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_RETURN_NOTDROPPED", id, g_szMLFlagTeam[iTeam])
+		}
 	}
 	else
-		client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_RETURN_NOTDROPPED", id, g_szMLFlagTeam[iTeam])
-	
+	{
+		client_print(id, print_console, "%s%L", CONSOLE_PREFIX, id, "ADMIN_TEAM_NOT_SPECIFIED") 
+	}
 	return PLUGIN_HANDLED
 }
 
@@ -1292,6 +1286,26 @@ public msg_teamScore()
 public msg_roundTime()
 {
 	set_msg_arg_int(1, ARG_SHORT, get_timeleft())
+}
+
+player_updateRender(id)
+{
+	new bool:bGlows = (get_pcvar_num(pCvar_ctf_glows) == 1)
+	new iMode = kRenderNormal
+	new iEffect = kRenderFxNone
+	new iAmount = 0
+	new iColor[3] = { 0, 0, 0 }
+	
+	if(g_bProtected[id])
+	{
+		iEffect = bGlows ? kRenderFxGlowShell : kRenderFxNone
+		iMode = bGlows ? kRenderNormal : kRenderTransAdd
+		iAmount = bGlows ? 90 : 100
+		
+		iColor[0] = bGlows ? (g_iTeam[id] == TEAM_RED ? 155 : 0) : 0
+		iColor[2] = bGlows ? (g_iTeam[id] == TEAM_BLUE ? 155 : 0) : 0
+	}
+	set_user_rendering(id, iEffect, iColor[0], iColor[1], iColor[2], iMode, iAmount)
 }
 
 player_healingEffect(id)
