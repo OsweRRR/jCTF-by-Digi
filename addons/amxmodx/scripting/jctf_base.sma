@@ -62,7 +62,7 @@ new const CONSOLE_PREFIX[] =			"[CTF] "
 
 #define get_opTeam(%1)				(%1 == TEAM_BLUE ? TEAM_RED : (%1 == TEAM_RED ? TEAM_BLUE : 0))
 
-#define VERSION					"1.33o"
+#define VERSION					"1.32o"
 #define AUTHOR					"Digi"
 
 enum
@@ -382,8 +382,25 @@ public plugin_cfg()
 				iFlagTeam++
 			}
 		}
+		fclose(iFile)
 	}
-	fclose(iFile)
+	else
+	{
+		for(new iFlagTeam = TEAM_RED; iFlagTeam <= TEAM_BLUE; iFlagTeam++)
+		{
+			new iFindSpawn = find_ent_by_class(MaxClients, iFlagTeam == TEAM_BLUE ? "info_player_start" : "info_player_deathmatch")
+			if(iFindSpawn)
+			{
+				log_error(AMX_ERR_NOTFOUND, "[CTF] %s flag origin not defined, set on player spawn.", g_szTeamName[iFlagTeam])
+				entity_get_vector(iFindSpawn, EV_VEC_origin, g_fFlagBase[iFlagTeam])
+			}
+			else
+			{
+				log_error(AMX_ERR_NOTFOUND, "[CTF] WARNING: player spawn for ^"%s^" team does not exist.", g_szTeamName[iFlagTeam])
+				set_fail_state("Player spawn unexistent!")
+			}
+		}
+	}
 	
 	flag_spawn(TEAM_RED)
 	flag_spawn(TEAM_BLUE)
@@ -393,7 +410,7 @@ public plugin_cfg()
 
 public plugin_cfg_post()
 {
-	set_cvar_num("mp_buytime", 0)
+	set_cvar_num("mp_buytime", -1)
 	set_cvar_num("mp_refill_bpammo_weapons", 2)
 	set_cvar_num("mp_item_staytime", 15)
 	set_cvar_string("mp_round_infinite", "f")
@@ -459,28 +476,7 @@ public jctf_flag(iEvent, iPlayer, iFlagTeam, bool:bAssist)
 
 public flag_spawn(iFlagTeam)
 {
-	if(g_fFlagBase[iFlagTeam][x] == 0.0 && g_fFlagBase[iFlagTeam][y] == 0.0 && g_fFlagBase[iFlagTeam][z] == 0.0)
-	{
-		new iFindSpawn = find_ent_by_class(MaxClients, iFlagTeam == TEAM_BLUE ? "info_player_start" : "info_player_deathmatch")
-
-		if(iFindSpawn)
-		{
-			entity_get_vector(iFindSpawn, EV_VEC_origin, g_fFlagBase[iFlagTeam])
-			
-			server_print("[CTF] %s flag origin not defined, set on player spawn.", g_szTeamName[iFlagTeam])
-			log_error(AMX_ERR_NOTFOUND, "[CTF] %s flag origin not defined, set on player spawn.", g_szTeamName[iFlagTeam])
-		}
-		else
-		{
-			server_print("[CTF] WARNING: player spawn for ^"%s^" team does not exist !", g_szTeamName[iFlagTeam])
-			log_error(AMX_ERR_NOTFOUND, "[CTF] WARNING: player spawn for ^"%s^" team does not exist !", g_szTeamName[iFlagTeam])
-			set_fail_state("Player spawn unexistent!")
-			
-			return PLUGIN_CONTINUE
-		}
-	}
-	else
-		server_print("[CTF] %s flag and base spawned at: %.1f %.1f %.1f", g_szTeamName[iFlagTeam], g_fFlagBase[iFlagTeam][x], g_fFlagBase[iFlagTeam][y], g_fFlagBase[iFlagTeam][z])
+	server_print("[CTF] %s flag and base spawned at: %.1f %.1f %.1f", g_szTeamName[iFlagTeam], g_fFlagBase[iFlagTeam][x], g_fFlagBase[iFlagTeam][y], g_fFlagBase[iFlagTeam][z])
 	
 	new ent
 	new Float:fGameTime = get_gametime()
@@ -906,6 +902,7 @@ public client_putinserver(id)
 	
 	g_bProtected[id] = false
 	g_bAdrenaline[id] = 0
+	g_bRespawn[id] = get_systime() + get_pcvar_num(pCvar_ctf_respawntime)
 	
 	g_iTeam[id] = TEAM_SPEC
 }
@@ -913,10 +910,8 @@ public client_putinserver(id)
 public client_disconnected(id)
 {
 	player_dropFlag(id)
-	remove_task(id)
 	
 	g_iTeam[id] = TEAM_NONE
-	g_bRespawn[id] = get_systime() + get_pcvar_num(pCvar_ctf_respawntime)
 	
 	g_bAssisted[id][TEAM_RED] = false
 	g_bAssisted[id][TEAM_BLUE] = false
@@ -1179,7 +1174,7 @@ public admin_cmd_saveFlags(id, level, cid)
 
 	formatex(szBuffer, charsmax(szBuffer), "%d %d %d^n%d %d %d", iOrigin[TEAM_RED][x], iOrigin[TEAM_RED][y], iOrigin[TEAM_RED][z], iOrigin[TEAM_BLUE][x], iOrigin[TEAM_BLUE][y], iOrigin[TEAM_BLUE][z])
 	formatex(szFile, charsmax(szFile), FLAG_SAVELOCATION, szMap)
-
+	
 	if(file_exists(szFile))
 		delete_file(szFile)
 	
@@ -1246,17 +1241,6 @@ public event_restartGame()
 
 public event_roundStart()
 {
-	for(new id = 1; id <= MaxClients; id++)
-	{
-		if(!is_user_alive(id))
-			continue
-		
-		if(g_bRestarting)
-		{
-			remove_task(id)
-		}
-	}
-	
 	for(new iFlagTeam = TEAM_RED; iFlagTeam <= TEAM_BLUE; iFlagTeam++)
 	{
 		flag_sendHome(iFlagTeam)
