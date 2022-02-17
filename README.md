@@ -1,5 +1,5 @@
 # jCTF by Digi (aka Hunter-Digital)
-Este modo fue creado por <b>Digi (aka Hunter-Digital)</b> y al parecer la última actualización fue en 2012 desde su creación por lo que yo en 2018 decidí personalizar su última versión y a demas de eso optimizar el código y remover algunas funciones, también separar otras funciones.
+Este modo fue creado por <b>Digi (aka Hunter-Digital)</b> y al parecer la última actualización fue en 2012 desde su creación por lo que yo en 2018 decidí personalizar su última versión y además optimizar el código, remover algunas funciones y también separar otras funciones.
 
 * Versión actual: <b>1.32o</b>
 * Versión anterior: <b>1.32c</b>
