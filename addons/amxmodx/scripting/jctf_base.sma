@@ -16,6 +16,10 @@ new const Float:BASE_HEAL_DISTANCE =		96.0		// healing distance for flag
 new const FLAG_SAVELOCATION[] =			"maps/%s.ctf" // you can change where .ctf files are saved/loaded from
 
 new const INFO_TARGET[] =			"info_target"
+new const ITEM_CLASSNAME[] =			"ctf_item"
+
+new const Float:ITEM_HULL_MIN[3] =		{-1.0, -1.0, 0.0}
+new const Float:ITEM_HULL_MAX[3] =		{1.0, 1.0, 10.0}
 
 new const BASE_CLASSNAME[] =			"ctf_flagbase"
 new const Float:BASE_THINK =			0.25
@@ -36,10 +40,21 @@ new const Float:FLAG_HULL_MAX[3] =		{2.0, 2.0, 16.0}
 
 new const Float:FLAG_SPAWN_VELOCITY[3] =		{0.0, 0.0, -500.0}
 new const Float:FLAG_SPAWN_ANGLES[3] =		{0.0, 0.0, 0.0}
-
 new const Float:FLAG_DROP_VELOCITY[3] =		{0.0, 0.0, 50.0}
 
 new const Float:FLAG_PICKUPDISTANCE =		80.0
+
+const ITEM_MEDKIT =				0
+const ITEM_ADRENALINE =				1
+
+const ITEM_MEDKIT_GIVE =			25
+const ITEM_ADRENALINE_GIVE =			5
+
+new const ITEM_MODEL_MEDKIT[] =			"models/w_medkit.mdl"
+new const ITEM_MODEL_ADRENALINE[] =		"models/can.mdl"
+
+new const SND_GETMEDKIT[] =			"items/smallmedkit1.wav"
+new const SND_GETADRENALINE[] =			"items/medshot4.wav"
 
 const FLAG_ANI_DROPPED =			0
 const FLAG_ANI_STAND =				1
@@ -185,27 +200,29 @@ new g_iSync[4]
 new g_iFlagHolder[3]
 new g_iFlagEntity[3]
 new g_iBaseEntity[3]
-new g_iTeam[MAX_PLAYERS]
+new g_iTeam[MAX_PLAYERS + 1]
 new Float:g_fFlagDropped[3]
 
 new bool:g_bRestarting
-new bool:g_bAssisted[MAX_PLAYERS][3]
-new bool:g_bProtected[MAX_PLAYERS]
+new bool:g_bAssisted[MAX_PLAYERS + 1][3]
+new bool:g_bProtected[MAX_PLAYERS + 1]
 
-new g_bRespawn[MAX_PLAYERS]
-new g_bProtecting[MAX_PLAYERS]
-new g_bAdrenaline[MAX_PLAYERS]
-new g_bPlayerName[MAX_PLAYERS][MAX_NAME_LENGTH]
+new g_bRespawn[MAX_PLAYERS + 1]
+new g_bProtecting[MAX_PLAYERS + 1]
+new g_bAdrenaline[MAX_PLAYERS + 1]
+new g_bPlayerName[MAX_PLAYERS + 1][MAX_NAME_LENGTH]
 
 new Float:g_fFlagBase[3][3]
 new Float:g_fFlagLocation[3][3]
-new Float:g_fLastDrop[MAX_PLAYERS]
+new Float:g_fLastDrop[MAX_PLAYERS + 1]
 
 new pCvar_ctf_flagheal
 new pCvar_ctf_flagreturn
 new pCvar_ctf_respawntime
 new pCvar_ctf_protection
 new pCvar_ctf_glows
+new pCvar_ctf_itempercent
+new pCvar_ctf_itemstay
 
 new pCvar_ctf_sound[4]
 
@@ -214,13 +231,17 @@ new gMsg_HostageK
 new gMsg_HostagePos
 new gMsg_TeamScore
 
-new forward_ObjSpawn
 new gSpr_regeneration
 new handle_JctfFlag
 
 public plugin_precache()
 {
 	precache_model(FLAG_MODEL)
+	precache_model(ITEM_MODEL_MEDKIT)
+	precache_model(ITEM_MODEL_ADRENALINE)
+	
+	precache_sound(SND_GETMEDKIT)
+	precache_sound(SND_GETADRENALINE)
 	
 	gSpr_regeneration = precache_model("sprites/th_jctf_heal.spr")
 	
@@ -231,43 +252,6 @@ public plugin_precache()
 			precache_generic(fmt("sound/jctf/%s.mp3", g_szSounds[i][t]))
 		}
 	}
-	forward_ObjSpawn = register_forward(FM_Spawn, "pfn_ObjSpawn")
-}
-
-public pfn_ObjSpawn(ent)
-{
-	if(!pev_valid(ent))
-	{
-		return FMRES_IGNORED
-	}
-	
-	new sClass[24], i
-	pev(ent, pev_classname, sClass, charsmax(sClass))
-	
-	new const sEntitys[][] = 
-	{
-		"armoury_entity",
-		"func_bomb_target",
-		"info_bomb_target",
-		"hostage_entity",
-		"monster_scientist",
-		"func_hostage_rescue",
-		"info_hostage_rescue",
-		"info_vip_start",
-		"func_vip_safetyzone",
-		"func_escapezone",
-		"info_map_parameters"
-	}
-	
-	for(i = 0; i < sizeof sEntitys; i++)
-	{
-		if(equal(sClass, sEntitys[i]))
-		{
-			engfunc(EngFunc_RemoveEntity, ent)
-			return FMRES_SUPERCEDE
-		}
-	}
-	return FMRES_IGNORED
 }
 
 public plugin_init()
@@ -276,6 +260,7 @@ public plugin_init()
 	register_cvar("jctf_version", VERSION, (FCVAR_SERVER|FCVAR_SPONLY))
 	
 	register_touch(FLAG_CLASSNAME, "player", "flag_touch")
+	register_touch(ITEM_CLASSNAME, "player", "item_touch")
 	
 	register_think(FLAG_CLASSNAME, "flag_think")
 	register_think(BASE_CLASSNAME, "base_think")
@@ -283,7 +268,6 @@ public plugin_init()
 	
 	register_forward(FM_GetGameDescription, "pfn_GameDescription", 0)
 	register_forward(FM_ClientKill, "pfn_pAutoKilled", 0)
-	unregister_forward(FM_Spawn, forward_ObjSpawn)
 	
 	new iEnt = create_entity(INFO_TARGET)
 	if(iEnt)
@@ -291,6 +275,18 @@ public plugin_init()
 		entity_set_string(iEnt, EV_SZ_classname, TASK_CLASSNAME)
 		entity_set_float(iEnt, EV_FL_nextthink, get_gametime() + TASK_THINK)
 	}
+	
+	remove_entity_name("armoury_entity")
+	remove_entity_name("func_bomb_target")
+	remove_entity_name("info_bomb_target")
+	remove_entity_name("hostage_entity")
+	remove_entity_name("monster_scientist")
+	remove_entity_name("func_hostage_rescue")
+	remove_entity_name("info_hostage_rescue")
+	remove_entity_name("info_vip_start")
+	remove_entity_name("func_vip_safetyzone")
+	remove_entity_name("func_escapezone")
+	remove_entity_name("info_map_parameters")
 	
 	register_logevent("event_restartGame", 2, "1&Restart_Round", "1&Game_Commencing")
 	
@@ -335,6 +331,8 @@ public plugin_init()
 	pCvar_ctf_respawntime = register_cvar("ctf_respawntime", "8")
 	pCvar_ctf_protection = register_cvar("ctf_protection", "6")
 	pCvar_ctf_glows = register_cvar("ctf_glows", "1")
+	pCvar_ctf_itempercent = register_cvar("ctf_itempercent", "25")
+	pCvar_ctf_itemstay = register_cvar("ctf_itemstay", "15")
 	
 	pCvar_ctf_sound[EVENT_TAKEN] = register_cvar("ctf_sound_taken", "1")
 	pCvar_ctf_sound[EVENT_DROPPED] = register_cvar("ctf_sound_dropped", "1")
@@ -896,6 +894,45 @@ public base_think(ent)
 	}
 }
 
+public item_touch(ent, id)
+{
+	if(is_user_alive(id) && is_valid_ent(ent) && entity_get_int(ent, EV_INT_flags) & FL_ONGROUND)
+	{
+		new iType = entity_get_int(ent, EV_INT_iuser2)
+		switch(iType)
+		{
+			case ITEM_MEDKIT:
+			{
+				new iHealth = get_user_health(id)
+				if(iHealth >= 100)
+				{
+					return PLUGIN_HANDLED
+				}
+				set_user_health(id, clamp(iHealth + ITEM_MEDKIT_GIVE, 0, 100))
+				
+				client_print(id, print_center, "%L", id, "PICKED_HEALTH", ITEM_MEDKIT_GIVE)
+				
+				emit_sound(id, CHAN_ITEM, SND_GETMEDKIT, VOL_NORM, ATTN_NORM, 0, 110)
+			}
+			case ITEM_ADRENALINE:
+			{
+				if(g_bAdrenaline[id] >= LIMIT_ADRENALINE)
+				{
+					return PLUGIN_HANDLED
+				}
+				g_bAdrenaline[id] = clamp(g_bAdrenaline[id] + ITEM_ADRENALINE_GIVE, 0, LIMIT_ADRENALINE)
+				
+				client_print(id, print_center, "%L", id, "PICKED_ADRENALINE", ITEM_ADRENALINE_GIVE)
+				
+				emit_sound(id, CHAN_ITEM, SND_GETADRENALINE, VOL_NORM, ATTN_NORM, 0, 140)
+			}
+		}
+		remove_task(ent)
+		remove_entity(ent)
+	}
+	return PLUGIN_CONTINUE
+}
+
 public client_putinserver(id)
 {
 	get_user_name(id, g_bPlayerName[id], charsmax(g_bPlayerName[])) 
@@ -1042,12 +1079,72 @@ public event_playerKilled()
 			
 			client_print_color(iKiller, iKiller, "%s%L", CHAT_PREFIX, iKiller, "REWARD_KILL_FLAGHOLDER", REWARD_KILL_FLAGHOLDER)
 		}
+		
+		if(random_num(1, 100) < get_pcvar_float(pCvar_ctf_itempercent))
+		{
+			player_spawnItem(iVictim)
+		}
 	}
 	player_dropFlag(iVictim)
 	player_updateRender(iVictim)
 	
 	set_hudmessage(HUD_HINT)
 	ShowSyncHudMsg(iVictim, g_iSync[2], "%L: %L", iVictim, "HINT", iVictim, fmt("HINT_%d", random_num(1, 5)))
+}
+
+public player_spawnItem(id)
+{
+	new ent = create_entity(INFO_TARGET)
+	if(!ent)
+		return
+	
+	new iType
+	new Float:fOrigin[3]
+	new Float:fAngles[3]
+	new Float:fVelocity[3]
+	
+	entity_get_vector(id, EV_VEC_origin, fOrigin)
+	
+	fVelocity[x] = random_float(-100.0, 100.0)
+	fVelocity[y] = random_float(-100.0, 100.0)
+	fVelocity[z] = 50.0
+	
+	fAngles[1] = random_float(0.0, 360.0)
+	
+	switch((iType = random_num(0, 1)))
+	{
+		case ITEM_MEDKIT:
+		{
+			entity_set_model(ent, ITEM_MODEL_MEDKIT)
+			
+		}
+		case ITEM_ADRENALINE:
+		{
+			entity_set_model(ent, ITEM_MODEL_ADRENALINE)
+			entity_set_int(ent, EV_INT_skin, 2)
+		}
+	}
+	
+	entity_set_string(ent, EV_SZ_classname, ITEM_CLASSNAME)
+	DispatchSpawn(ent)
+	entity_set_size(ent, ITEM_HULL_MIN, ITEM_HULL_MAX)
+	entity_set_origin(ent, fOrigin)
+	entity_set_vector(ent, EV_VEC_angles, fAngles)
+	entity_set_vector(ent, EV_VEC_velocity, fVelocity)
+	entity_set_int(ent, EV_INT_movetype, MOVETYPE_TOSS)
+	entity_set_int(ent, EV_INT_solid, SOLID_TRIGGER)
+	entity_set_int(ent, EV_INT_iuser2, iType)
+	
+	remove_task(ent)
+	set_task(get_pcvar_float(pCvar_ctf_itemstay), "player_itemStay", ent)
+}
+
+public player_itemStay(ent)
+{
+	if(is_valid_ent(ent))
+	{
+		remove_entity(ent)
+	}
 }
 
 public player_cmd_dropFlag(id)
@@ -1241,6 +1338,13 @@ public event_restartGame()
 
 public event_roundStart()
 {
+	new ent = -1
+	while((ent = find_ent_by_class(ent, ITEM_CLASSNAME)) > 0)
+	{
+		remove_task(ent)
+		remove_entity(ent)
+	}
+	
 	for(new iFlagTeam = TEAM_RED; iFlagTeam <= TEAM_BLUE; iFlagTeam++)
 	{
 		flag_sendHome(iFlagTeam)
@@ -1254,6 +1358,8 @@ public event_roundStart()
 		g_iScore = {0, 0, 0}
 		g_bRestarting = false
 	}
+	
+	arrayset(g_bAdrenaline, 0, MAX_PLAYERS + 1)
 }
 
 public msg_teamScore()
