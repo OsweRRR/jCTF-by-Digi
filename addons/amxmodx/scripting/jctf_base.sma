@@ -1357,9 +1357,9 @@ public event_roundStart()
 	{
 		g_iScore = {0, 0, 0}
 		g_bRestarting = false
+		
+		arrayset(g_bAdrenaline, 0, MAX_PLAYERS + 1)
 	}
-	
-	arrayset(g_bAdrenaline, 0, MAX_PLAYERS + 1)
 }
 
 public msg_teamScore()
