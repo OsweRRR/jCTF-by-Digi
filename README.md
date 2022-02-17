@@ -1,5 +1,5 @@
 # jCTF by Digi (aka Hunter-Digital)
-Este modo fue creado por <b>Digi (aka Hunter-Digital)</b> y al parecer la ultima actualización fue en 2012 desde su creación por lo que yo en 2018 decidi personalizar su última versión y a demas de eso optimizar el código y remover algunas funciones, también separar otras funciones.
+Este modo fue creado por <b>Digi (aka Hunter-Digital)</b> y al parecer la última actualización fue en 2012 desde su creación por lo que yo en 2018 decidí personalizar su última versión y a demas de eso optimizar el código y remover algunas funciones, también separar otras funciones.
 
 * Versión actual: <b>1.32o</b>
 * Versión anterior: <b>1.32c</b>
@@ -11,10 +11,10 @@ Este modo fue creado por <b>Digi (aka Hunter-Digital)</b> y al parecer la ultima
 
 ## ¿Qué le hice?
 * Removí el buy personalizado (incluyendo la compra del C4 e items con adrenalina).
-* El sistema de adrenalina lo quite para hacerlo por separado del mod sin embargo las natives seguiran siendo las mismas.
-* Modelo de la bandera en <b>movimiento</b> (No lo hice yo.. el model personalizado es público).
+* El sistema de adrenalina lo quite para hacerlo por separado del modo sin embargo las natives seguiran siendo las mismas.
+* Modelo de la bandera en <b>movimiento</b> (No lo hice yo, el model personalizado es público).
 * Le agregue para que la bandera se pueda soltar desde las teclas Z, X ó C.
-* Le hice un remake al sistema del respawn y protección de spawn (ya no se bug los segundos al revivir/protección).
+* Le hice un remake al sistema del respawn y protección de spawn (ya no hay bug de los segundos al revivir/protección).
 * El spawn de armas lo cambié por armas aleatorias.
 * Personalize los huds y también cuando este sale lo hace por un canal que estee disponible para 'tratar' de evitar la desaparición de los huds o un flood de canales.
 * Removí <b>Orpheu</b> debido a que se usará <b>ReGameDLL</b> (<b>Orpheu</b> solo funcionaba para hookear la ronda).
@@ -34,7 +34,7 @@ Este modo fue creado por <b>Digi (aka Hunter-Digital)</b> y al parecer la ultima
 | ctf_sound_returned            | 1   | 0   | 1   | Sonido que se emite al ser devuelta la bandera:<br/>`0` desactivado <br/>`1` activado |
 | ctf_sound_score               | 1   | 0   | 1   | Sonido que se emite al sumar puntuación después de capturar la bandera:<br/>`0` desactivado <br/>`1` activado |
 | ctf_itempercent               | 25  | 1   | 100 | Porcentaje al soltar un item cuando muere un player, el item puede ser adrenalina ó medkit. |
-| ctf_itemstay                  | 15  | 1   | -   | Tiempo en segundos que permanecera un item en el suelo, el item puede ser adrenalina ó medkit. |
+| ctf_itemstay                  | 15  | 1   | -   | Tiempo en segundos que permanecerá un item en el suelo, el item puede ser adrenalina ó medkit. |
 | ctf_glows                     | 1   | 0   | 1   | Le añade un glow a la base de la bandera y a los jugadores cuando reciben protección en el spawn:<br/>`0` desactivado <br/>`1` activado |
 
 
